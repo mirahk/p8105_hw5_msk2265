@@ -47,6 +47,7 @@ data_df = data_df %>%
 ggplot(data = data_df, aes(x = weeks, y= measure, group = id, color=group))+ geom_line()
 ```
 
+From the plot above, we can see that generally, the experimental group had higher measures that increased over time. The control group does not seem to show a pattern of increase and instead hovers around the 0-2.5 measure(with some exceptions). Thus from this graph we can conclude that the experimental grud had some effect on participants, but further statistical analysis would have to be used to confirm if the effect was statisitcally significant. 
 ## Problem 3
 
 ```{r}
@@ -78,7 +79,6 @@ for (i in 1:5000) {
   output_0[[i]] = power(0)
 }
 ```
-
 
 ```{r}
 output_1 = vector("list", 5000)
@@ -115,6 +115,7 @@ for (i in 1:5000) {
 
 
 ```{r}
+#merging into one dataset
 sim_results =bind_rows(output_0, output_1, output_2, output_3, output_4, output_5, output_6) %>% 
   mutate(result= ifelse(ttest$p.value<0.05, "reject", "fail to reject")
   )
@@ -135,7 +136,9 @@ plot1= sim_results %>%
 
 ```
 
+Although the plot shows variation in the proportions, the proportions are all close to 0.05. for the randomly generated set I produced, there does not seem to be a pattern, since true mu of 0,3,5, and 6 are above 0.05 and 1,2,and 4 are below. perhaps more iterations would resutl in a pattern, or continuing the simulation to higher values of mu. 
 ```{r}
+#plots comparing mu hat to true mue
 plot2= sim_results %>% 
   ungroup() %>% 
   group_by(mu) %>% 
@@ -152,6 +155,6 @@ plot3= sim_results %>%
 ggplot(plot3, aes(x=mu, y=avg))+geom_line()
   
 ```
-
+In the plots above, we can see that when mu hat is averaged across all of the simulated data by mu, the average is very close to true mu. The first plot show a straight line, and I would assume that as the number of iterations of my simulation increases, the mu hat average will tend towards true mu. The second plot, which was the plot with only the mu hats that resulted in a rejection of the null, shows a deviation from true mu. I can see that the mu hat value for mu=4 seems to he a little high, the mu hat for 5 seems low, and 6 seems high. Still, even the rejected values are approximently equal to the tru values of mu. 
 ```
 
