@@ -10,7 +10,7 @@ library(tidyverse)
 library(rvest)
 ```
 
-## Problem 1
+## Problem 2
 ```{r}
 #making a data frame with all of the file names
 file_names = list.files(path = "./data", full.names = TRUE)
@@ -45,6 +45,71 @@ data_df = data_df %>%
 #making spaghetti plot:)
 
 ggplot(data = data_df, aes(x = weeks, y= measure, group = id, color=group))+ geom_line()
+```
+
+## Problem 3
+
+```{r}
+set.seed(1)
+
+#creating function
+power = function(mu, n=30, sigma = 5){
+  sim_data = tibble(
+    x = rnorm(n, mean = mu, sd = sigma),
+  )
+  
+  sim_data %>%  
+    summarize(
+      mu_hat = mean(x),
+      ttest = broom::tidy(t.test(x, mu=mu, conf.level=.95))
+    )
+}
+```
+
+
+```{r}
+#creating simulations
+output_0 = vector("list", 5000)
+
+for (i in 1:5000) {
+  output_0[[i]] = power(0)
+}
+
+output_1 = vector("list", 5000)
+
+for (i in 1:5000) {
+  output_1[[i]] = power(1)
+}
+output_2 = vector("list", 5000)
+
+for (i in 1:5000) {
+  output_2[[i]] = power(2)
+}
+output_3 = vector("list", 5000)
+
+for (i in 1:5000) {
+  output_3[[i]] = power(3)
+}
+output_4 = vector("list", 5000)
+
+for (i in 1:5000) {
+  output_4[[i]] = power(4)
+}
+output_5 = vector("list", 5000)
+
+for (i in 1:5000) {
+  output_5[[i]] = power(5)
+}
+output_6 = vector("list", 5000)
+
+for (i in 1:5000) {
+  output_6[[i]] = power(6)
+}
+```
+
+
+```{r}
+sim_results =bind_rows(output_0, output_1, output_2, output_3, output_4, output_5, output_6)
 ```
 
 
