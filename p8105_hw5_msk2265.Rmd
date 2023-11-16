@@ -12,59 +12,34 @@ library(rvest)
 
 ```{r}
 #making a data frame with all of the file names
-file_names = list.files(path = "./data")
-```
-```{r}
-  trial = read_csv("./data/con_01.csv") %>% 
-    janitor::clean_names() %>% 
-    pivot_longer(
-      week_1:week_8,
-      names_to = "week",
-      values_to = "measure"
-    ) %>% 
-    mutate(id = 1, group= "control") %>% 
-    select(id, everything())
-  trial
-
+file_names = list.files(path = "./data", full.names = TRUE)
 ```
 
-```{r}
-data_load_and_tidy = function(path, sub_id, sub_group){
-  df = read_csv(path) %>% 
-    janitor::clean_names() %>% 
-    pivot_longer(
-      week_1:week_8,
-      names_to = "week",
-      values_to = "measure"
-    ) %>% 
-    mutate(id = sub_id, group = sub_group) %>% 
-    select(id, everything())
-  df
-}
 
-data_df = 
-  bind_rows(
-    data_load_and_tidy("./data/con_01.csv", 1, "control"),
-    data_load_and_tidy("./data/con_02.csv", 2, "control"),
-    data_load_and_tidy("./data/con_03.csv", 3, "control"),
-    data_load_and_tidy("./data/con_04.csv", 4, "control"),
-    data_load_and_tidy("./data/con_05.csv", 5, "control"),
-    data_load_and_tidy("./data/con_06.csv", 6, "control"),
-    data_load_and_tidy("./data/con_07.csv", 7, "control"),
-    data_load_and_tidy("./data/con_08.csv", 8, "control"),
-    data_load_and_tidy("./data/con_09.csv", 9, "control"),
-    data_load_and_tidy("./data/con_10.csv", 10, "control"),
-    data_load_and_tidy("./data/exp_01.csv", 11, "experimental"),
-    data_load_and_tidy("./data/exp_02.csv", 12, "experimental"),
-    data_load_and_tidy("./data/exp_03.csv", 13, "experimental"),
-    data_load_and_tidy("./data/exp_04.csv", 14, "experimental"),
-    data_load_and_tidy("./data/exp_05.csv", 15, "experimental"),
-    data_load_and_tidy("./data/exp_06.csv", 16, "experimental"),
-    data_load_and_tidy("./data/exp_07.csv", 17, "experimental"),
-    data_load_and_tidy("./data/exp_08.csv", 18, "experimental"),
-    data_load_and_tidy("./data/exp_09.csv", 19, "experimental"),
-    data_load_and_tidy("./data/exp_10.csv", 20, "experimental"),
-  )
+```{r}
+trial= purrr::map(file_names, ~read_csv(.))
+  trial = set_names(trial, file_names)
+data_df = bind_rows(trial, .id="file_names")
+```
+
+
+```{r}
+data_df = data_df %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    week_1:week_8,
+    names_to = "weeks",
+    names_prefix = "week_",
+    values_to = "measure") %>% 
+  mutate(group = 
+           if_else(str_detect(file_names, "con"), "control", "experimental")) %>% 
+  mutate(id = match(file_names, unique(file_names))) %>% 
+  select(id,everything(), -file_names)
+  
+      
+           
+```
+
 
 ```
 
