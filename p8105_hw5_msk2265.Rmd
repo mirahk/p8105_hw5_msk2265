@@ -10,6 +10,7 @@ library(tidyverse)
 library(rvest)
 ```
 
+## Problem 1
 ```{r}
 #making a data frame with all of the file names
 file_names = list.files(path = "./data", full.names = TRUE)
@@ -19,11 +20,12 @@ file_names = list.files(path = "./data", full.names = TRUE)
 ```{r}
 trial= purrr::map(file_names, ~read_csv(.))
   trial = set_names(trial, file_names)
-data_df = bind_rows(trial, .id="file_names")
+data_df = bind_rows(trial, .id="file_names") # making sure that I can identify the rows of data by adding an id
 ```
 
 
 ```{r}
+#tidying data
 data_df = data_df %>% 
   janitor::clean_names() %>% 
   pivot_longer(
@@ -31,13 +33,18 @@ data_df = data_df %>%
     names_to = "weeks",
     names_prefix = "week_",
     values_to = "measure") %>% 
+  mutate(weeks = as.numeric(weeks)) %>% 
   mutate(group = 
            if_else(str_detect(file_names, "con"), "control", "experimental")) %>% 
   mutate(id = match(file_names, unique(file_names))) %>% 
   select(id,everything(), -file_names)
   
-      
            
+```
+```{r}
+#making spaghetti plot:)
+
+ggplot(data = data_df, aes(x = weeks, y= measure, group = id, color=group))+ geom_line()
 ```
 
 
